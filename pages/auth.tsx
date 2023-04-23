@@ -3,8 +3,12 @@ import { useCallback } from "react";
 import Input from "@/components/input";
 import axios from "axios";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/router";
+import { FcGoogle } from "react-icons/fc";
+import { FcAbout } from "react-icons/fc";
 
 const Auth = () => {
+    const router = useRouter();
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
@@ -14,18 +18,6 @@ const Auth = () => {
         setVariant((currentVariant) => (currentVariant === "login" ? "register" : "login"));
     }, []);
 
-    const register = useCallback(async () => {
-        try {
-            await axios.post("/api/register", {
-                email,
-                name,
-                password,
-            });
-        } catch (err) {
-            console.log(err);
-        }
-    }, [email, name, password]);
-
     const login = useCallback(async () => {
         try {
             await signIn("credentials", {
@@ -34,10 +26,25 @@ const Auth = () => {
                 redirect: false,
                 callbackUrl: "/",
             });
+            router.push("/");
         } catch (err) {
             console.log(err);
         }
-    }, [email, password]);
+    }, [email, password, router]);
+
+    const register = useCallback(async () => {
+        try {
+            await axios.post("/api/register", {
+                email,
+                name,
+                password,
+            });
+            login();
+        } catch (err) {
+            console.log(err);
+        }
+    }, [email, name, password, login]);
+
     return (
         <div className="relative h-full w-full bg-[url('/images/hero.jpg')] bg-no-repeat bg-fixed bg-cover">
             <div className="bg-black w-full h-full lg:bg-opacity-50">
@@ -79,6 +86,38 @@ const Auth = () => {
                         >
                             {variant === "login" ? "Sign In" : "Sign Up"}
                         </button>
+                        <div className="flex flex-row item-center gap-4 mt-8 justify-center">
+                            <div
+                                className="
+                                    w-10
+                                    h-10
+                                    rounded-full
+                                    bg-white
+                                    flex
+                                    items-center
+                                    justify-center
+                                    cursor-pointer
+                                    hover:opacity-80
+                                    transition"
+                            >
+                                <FcGoogle className="text-2xl" />
+                            </div>
+                            <div
+                                className="
+                                    w-10
+                                    h-10
+                                    rounded-full
+                                    bg-white
+                                    flex
+                                    items-center
+                                    justify-center
+                                    cursor-pointer
+                                    hover:opacity-80
+                                    transition"
+                            >
+                                <FcAbout className="text-2xl" />
+                            </div>
+                        </div>
                         <p className="text-neutral-500 mt-12">
                             {variant === "login"
                                 ? "First time using Netflix?"
